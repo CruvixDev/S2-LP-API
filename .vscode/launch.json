@@ -27,6 +27,32 @@
             "serverArgs": [
                 "-m","0",
             ],
+            "preLaunchCommands": [ //All GDB commands to enable SWV and ITM
+                "monitor swv info",
+                "monitor swv start 7d0", //7d0 = 2000kHz
+                
+                "set *(unsigned int *)0x5c001004 = 0x700007", //DBGMCU_CR
+                "set *(unsigned int *)0xe00400f0 = 0x2", //TPIU_SPPR
+                "set *(unsigned int *)0xe0040010 = 0x1f", //TPIU_ACPR
+                "set *(unsigned int *)0xe0000fb0 = 0xc5acce55", //ITM_LAR
+                "set *(unsigned int *)0xe0000e80 = 0x1000f", //ITM_TCR
+                "set *(unsigned int *)0xe0000e40 = 0x0", //ITM_TPR
+                "set *(unsigned int *)0xe0000e00 = 0x1", //ITM_TER
+                "set *(unsigned int *)0x5c004fb0 = 0xc5acce55", //SWTF_LAR
+                "set *(unsigned int *)0x5c003fb0 = 0xc5acce55", //SWO_LAR
+                "set *(unsigned int *)0x5c003010 = 0x1f", //SWO_CODR
+                "set *(unsigned int *)0x5c0030f0 = 0x2", //SWO_SPPR
+                "set *(unsigned int *)0x5c004000 = 0x1", //SWTF_CTRL
+                "set *(unsigned int *)0xe0001020 = 0x0", //DWT_COMP0
+                "set *(unsigned int *)0xe0001030 = 0x0", //DWT_COMP1
+                "set *(unsigned int *)0xe0001040 = 0x0", //DWT_COMP2
+                "set *(unsigned int *)0xe0001050 = 0x0", //DWT_COMP3
+                "set *(unsigned int *)0xe0001000 = 0x7ff", //DWT_CTRL
+                "set *(unsigned int *)0xe0040304 = 0x100", //TPIU_FFCR
+                
+                "set *(int *)0xe000ed14=*(int *)0xe000eD14|0x10", //CCR
+                "set *(int *)0xe000edfc=*(int *)0xe000edfc|0x7F0", //DEMCR
+            ]
             //"preLaunchTask": "Build + Flash"
             /* If you use external loader, add additional arguments */
             //"serverArgs": ["--extload", "path/to/ext/loader.stldr"],

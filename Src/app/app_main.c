@@ -17,6 +17,7 @@
 #include "hal/hal_clock.h"
 #include "hal/hal_spi.h"
 #include "hal/hal_gpio.h"
+#include "hal/hal_itm.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -50,7 +51,8 @@ int main(void) {
   vHAL_GPIO_init();
   errHAL_SPI_init();
 
-  S2LPGeneralGetDevicePN();
+  uint8_t l_u8DevicePN = S2LPGeneralGetDevicePN();
+  vHAL_ITM_logInfo("Device Part Number: %d\n", l_u8DevicePN);
 
   /* Main infinite loop */
   while (true) {

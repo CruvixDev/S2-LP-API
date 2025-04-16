@@ -14,6 +14,7 @@
 
 /* Associated interfaces -----------------------------------------------------*/
 #include "hal/hal_spi.h"
+#include "hal/hal_gpio.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -118,10 +119,14 @@ Error errHAL_SPI_transmitReceive(const uint8_t* p_pu8DataTx, uint8_t* p_pu8DataR
   Error l_error = cLIB_ERRORNO_NoErr;
   HAL_StatusTypeDef l_status = HAL_OK;
 
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+
   l_status = HAL_SPI_TransmitReceive(&hspi1, p_pu8DataTx, p_pu8DataRx, p_u16Size, cHAL_SPI_DEFAULT_TIMEOUT);
   if (l_status != HAL_OK) {
     l_error = cLIB_ERRORNO_FctExecutionFailed;
   }
+
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 
   return l_error;
 }

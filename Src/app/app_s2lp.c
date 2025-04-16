@@ -14,7 +14,7 @@
 #include "hal/hal_spi.h"
 
 /* Associated interfaces -----------------------------------------------------*/
-#include "app/app_s2lp.h"
+#include "S2LP_CORE_SPI.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -37,21 +37,21 @@ static uint8_t g_au8BufferRx[cAPP_S2LP_STATUS_SIZE + cAPP_S2LP_FIFO_SIZE];
 /* Private function prototypes -----------------------------------------------*/
 
 /* Public functions ----------------------------------------------------------*/
-StatusBytes sAPP_S2LP_writeRegisters(uint8_t p_u8RegAddress, uint8_t p_u8Size, uint8_t* p_pu8DataTx) {
+uint16_t S2LPSpiWriteRegisters(uint8_t RegisterAddr, uint8_t NumByteToRead, uint8_t* pBuffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  StatusBytes l_status = {0};
+  uint16_t l_status = {0};
 
   g_au8BufferTx[0] = cAPP_S2LP_WRITE_HEADER;
-  g_au8BufferTx[1] = p_u8RegAddress;
+  g_au8BufferTx[1] = RegisterAddr;
 
-  for (uint8_t l_u8Index = 0; l_u8Index < p_u8Size; l_u8Index++) {
-    g_au8BufferTx[l_u8Index + cAPP_S2LP_HEADER_SIZE] = p_pu8DataTx[l_u8Index];
+  for (uint8_t l_u8Index = 0; l_u8Index < NumByteToRead; l_u8Index++) {
+    g_au8BufferTx[l_u8Index + cAPP_S2LP_HEADER_SIZE] = pBuffer[l_u8Index];
   }
 
-  l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, (uint16_t)(p_u8Size + cAPP_S2LP_STATUS_SIZE));
+  l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, (uint16_t)(NumByteToRead + cAPP_S2LP_STATUS_SIZE));
   if (l_error == cLIB_ERRORNO_NoErr) {
-    ((uint8_t*)&l_status)[1]=g_au8BufferRx[0];
-    ((uint8_t*)&l_status)[0]=g_au8BufferRx[1];
+    ((uint8_t*)&l_status)[1] = g_au8BufferRx[0];
+    ((uint8_t*)&l_status)[0] = g_au8BufferRx[1];
   }
   else {
     //Nothing
@@ -60,22 +60,22 @@ StatusBytes sAPP_S2LP_writeRegisters(uint8_t p_u8RegAddress, uint8_t p_u8Size, u
   return l_status;
 }
 
-StatusBytes sAPP_S2LP_readRegisters(uint8_t p_u8RegAddress, uint8_t p_u8Size, uint8_t* p_pu8DataRx) {
+uint16_t S2LPSpiReadRegisters(uint8_t RegisterAddr, uint8_t NumByteToRead, uint8_t* pBuffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  StatusBytes l_status = {0};
+  uint16_t l_status = {0};
 
   g_au8BufferTx[0] = cAPP_S2LP_READ_HEADER;
-  g_au8BufferTx[1] = p_u8RegAddress;
+  g_au8BufferTx[1] = RegisterAddr;
 
-  l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, (uint16_t)(p_u8Size + cAPP_S2LP_STATUS_SIZE));
+  l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, (uint16_t)(NumByteToRead + cAPP_S2LP_STATUS_SIZE));
   if (l_error == cLIB_ERRORNO_NoErr) {
 
-    for (uint8_t l_u8Index = 0; l_u8Index < p_u8Size; l_u8Index++) {
-      p_pu8DataRx[l_u8Index] = g_au8BufferRx[l_u8Index + cAPP_S2LP_STATUS_SIZE];
+    for (uint8_t l_u8Index = 0; l_u8Index < NumByteToRead; l_u8Index++) {
+      pBuffer[l_u8Index] = g_au8BufferRx[l_u8Index + cAPP_S2LP_STATUS_SIZE];
     }
 
-    ((uint8_t*)&l_status)[1]=g_au8BufferRx[0];
-    ((uint8_t*)&l_status)[0]=g_au8BufferRx[1];
+    ((uint8_t*)&l_status)[1] = g_au8BufferRx[0];
+    ((uint8_t*)&l_status)[0] = g_au8BufferRx[1];
   }
   else {
     //Nothing
@@ -84,17 +84,17 @@ StatusBytes sAPP_S2LP_readRegisters(uint8_t p_u8RegAddress, uint8_t p_u8Size, ui
   return l_status;
 }
 
-StatusBytes sAPP_S2LP_commandStrobes(uint8_t p_u8CommandCode) {
+uint16_t S2LPSpiCommandStrobes(uint8_t command) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  StatusBytes l_status = {0};
+  uint16_t l_status = {0};
 
   g_au8BufferTx[0] = cAPP_S2LP_CMD_HEADER;
-  g_au8BufferTx[1] = p_u8CommandCode;
+  g_au8BufferTx[1] = command;
 
   l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, cAPP_S2LP_HEADER_SIZE);
   if (l_error == cLIB_ERRORNO_NoErr) {
-    ((uint8_t*)&l_status)[1]=g_au8BufferRx[0];
-    ((uint8_t*)&l_status)[0]=g_au8BufferRx[1];
+    ((uint8_t*)&l_status)[1] = g_au8BufferRx[0];
+    ((uint8_t*)&l_status)[0] = g_au8BufferRx[1];
   }
   else {
     //Nothing
@@ -103,21 +103,21 @@ StatusBytes sAPP_S2LP_commandStrobes(uint8_t p_u8CommandCode) {
   return l_status;
 }
 
-StatusBytes sAPP_S2LP_writeFifo(uint8_t p_u8Size, uint8_t* p_pu8FIFOBuffer) {
+uint16_t S2LPSpiWriteFifo(uint8_t n_bytes, uint8_t* buffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  StatusBytes l_status = {0};
+  uint16_t l_status = {0};
 
   g_au8BufferTx[0] = cAPP_S2LP_WRITE_HEADER;
   g_au8BufferTx[1] = cAPP_S2LP_LINEAR_FIFO_ADDRESS;
 
-  for (uint8_t l_u8Index = 0; l_u8Index < p_u8Size; l_u8Index++) {
-    g_au8BufferTx[l_u8Index + cAPP_S2LP_HEADER_SIZE] = p_pu8FIFOBuffer[l_u8Index];
+  for (uint8_t l_u8Index = 0; l_u8Index < n_bytes; l_u8Index++) {
+    g_au8BufferTx[l_u8Index + cAPP_S2LP_HEADER_SIZE] = buffer[l_u8Index];
   }
 
-  l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, (uint16_t)(p_u8Size + cAPP_S2LP_STATUS_SIZE));
+  l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, (uint16_t)(n_bytes + cAPP_S2LP_STATUS_SIZE));
   if (l_error == cLIB_ERRORNO_NoErr) {
-    ((uint8_t*)&l_status)[1]=g_au8BufferRx[0];
-    ((uint8_t*)&l_status)[0]=g_au8BufferRx[1];
+    ((uint8_t*)&l_status)[1] = g_au8BufferRx[0];
+    ((uint8_t*)&l_status)[0] = g_au8BufferRx[1];
   }
   else {
     //Nothing
@@ -126,22 +126,22 @@ StatusBytes sAPP_S2LP_writeFifo(uint8_t p_u8Size, uint8_t* p_pu8FIFOBuffer) {
   return l_status;
 }
 
-StatusBytes sAPP_S2LP_readFifo(uint8_t p_u8Size, uint8_t* p_pu8FIFOBuffer) {
+uint16_t S2LPSpiReadFifo(uint8_t n_bytes, uint8_t* buffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  StatusBytes l_status = {0};
+  uint16_t l_status = {0};
 
   g_au8BufferTx[0] = cAPP_S2LP_READ_HEADER;
   g_au8BufferTx[1] = cAPP_S2LP_LINEAR_FIFO_ADDRESS;
 
-  l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, (uint16_t)(p_u8Size + cAPP_S2LP_STATUS_SIZE));
+  l_error = errHAL_SPI_transmitReceive(g_au8BufferTx, g_au8BufferRx, (uint16_t)(n_bytes + cAPP_S2LP_STATUS_SIZE));
   if (l_error == cLIB_ERRORNO_NoErr) {
 
-    for (uint8_t l_u8Index = 0; l_u8Index < p_u8Size; l_u8Index++) {
-      p_pu8FIFOBuffer[l_u8Index] = g_au8BufferRx[l_u8Index + cAPP_S2LP_STATUS_SIZE];
+    for (uint8_t l_u8Index = 0; l_u8Index < n_bytes; l_u8Index++) {
+      buffer[l_u8Index] = g_au8BufferRx[l_u8Index + cAPP_S2LP_STATUS_SIZE];
     }
 
-    ((uint8_t*)&l_status)[1]=g_au8BufferRx[0];
-    ((uint8_t*)&l_status)[0]=g_au8BufferRx[1];
+    ((uint8_t*)&l_status)[1] = g_au8BufferRx[0];
+    ((uint8_t*)&l_status)[0] = g_au8BufferRx[1];
   }
   else {
     //Nothing

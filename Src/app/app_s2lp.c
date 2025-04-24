@@ -39,7 +39,7 @@ static uint8_t g_au8BufferRx[cAPP_S2LP_STATUS_SIZE + cAPP_S2LP_FIFO_SIZE];
 /* Public functions ----------------------------------------------------------*/
 uint16_t S2LPSpiWriteRegisters(uint8_t RegisterAddr, uint8_t NumByteToRead, uint8_t* pBuffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  uint16_t l_status = {0};
+  uint16_t l_status = 0;
 
   g_au8BufferTx[0] = cAPP_S2LP_WRITE_HEADER;
   g_au8BufferTx[1] = RegisterAddr;
@@ -62,7 +62,7 @@ uint16_t S2LPSpiWriteRegisters(uint8_t RegisterAddr, uint8_t NumByteToRead, uint
 
 uint16_t S2LPSpiReadRegisters(uint8_t RegisterAddr, uint8_t NumByteToRead, uint8_t* pBuffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  uint16_t l_status = {0};
+  uint16_t l_status = 0;
 
   g_au8BufferTx[0] = cAPP_S2LP_READ_HEADER;
   g_au8BufferTx[1] = RegisterAddr;
@@ -86,7 +86,7 @@ uint16_t S2LPSpiReadRegisters(uint8_t RegisterAddr, uint8_t NumByteToRead, uint8
 
 uint16_t S2LPSpiCommandStrobes(uint8_t command) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  uint16_t l_status = {0};
+  uint16_t l_status = 0;
 
   g_au8BufferTx[0] = cAPP_S2LP_CMD_HEADER;
   g_au8BufferTx[1] = command;
@@ -105,7 +105,7 @@ uint16_t S2LPSpiCommandStrobes(uint8_t command) {
 
 uint16_t S2LPSpiWriteFifo(uint8_t n_bytes, uint8_t* buffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  uint16_t l_status = {0};
+  uint16_t l_status = 0;
 
   g_au8BufferTx[0] = cAPP_S2LP_WRITE_HEADER;
   g_au8BufferTx[1] = cAPP_S2LP_LINEAR_FIFO_ADDRESS;
@@ -128,7 +128,7 @@ uint16_t S2LPSpiWriteFifo(uint8_t n_bytes, uint8_t* buffer) {
 
 uint16_t S2LPSpiReadFifo(uint8_t n_bytes, uint8_t* buffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
-  uint16_t l_status = {0};
+  uint16_t l_status = 0;
 
   g_au8BufferTx[0] = cAPP_S2LP_READ_HEADER;
   g_au8BufferTx[1] = cAPP_S2LP_LINEAR_FIFO_ADDRESS;

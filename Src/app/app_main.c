@@ -54,6 +54,9 @@ int main(void) {
   uint8_t l_u8DevicePN = S2LPGeneralGetDevicePN();
   vHAL_ITM_logInfo("Device Part Number: %d\n", l_u8DevicePN);
 
+  uint8_t l_u8S2LPVersion = S2LPGeneralGetVersion();
+  vHAL_ITM_logInfo("S2LP version: %d\n", l_u8S2LPVersion);
+
   /* Main infinite loop */
   while (true) {
 

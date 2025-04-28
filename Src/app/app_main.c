@@ -11,13 +11,13 @@
 
 /* Associated interfaces -----------------------------------------------------*/
 #include "app/app_main.h"
-#include "S2LP_General.h"
 
 /* Used interfaces (dependencies includes) -----------------------------------*/
 #include "hal/hal_clock.h"
 #include "hal/hal_spi.h"
 #include "hal/hal_gpio.h"
 #include "hal/hal_itm.h"
+#include "app/app_s2lp.h"
 
 /* Private typedef -----------------------------------------------------------*/
 

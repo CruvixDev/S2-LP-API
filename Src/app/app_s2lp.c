@@ -11,10 +11,11 @@
 #include "lib/lib_errno.h"
 
 /* Used interfaces (dependencies includes) -----------------------------------*/
+#include "stm32h7xx_hal.h"
 #include "hal/hal_spi.h"
 
 /* Associated interfaces -----------------------------------------------------*/
-#include "S2LP_CORE_SPI.h"
+#include "app/app_s2lp.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -31,12 +32,55 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+static SRadioInit g_sRadioInit = {0};
+static PktBasicInit g_sBasicPacketInit = {0};
+static SGpioInit g_sGPIOInit = {0};
+
+static FlagStatus g_eTxDoneFlag = RESET;
+static FlagStatus g_eRxDoneFlag = RESET;
+static S2LPIrqs g_sIrqStatus;
+
 static uint8_t g_au8BufferTx[cAPP_S2LP_HEADER_SIZE + cAPP_S2LP_FIFO_SIZE];
 static uint8_t g_au8BufferRx[cAPP_S2LP_STATUS_SIZE + cAPP_S2LP_FIFO_SIZE];
 
 /* Private function prototypes -----------------------------------------------*/
 
 /* Public functions ----------------------------------------------------------*/
+void vAPP_S2LP_init(void) {
+  g_sRadioInit.lFrequencyBase = cAPP_S2LP_BASE_FREQUENCY_Hz;
+  g_sRadioInit.xModulationSelect = cAPP_S2LP_MODULATION_SCHEME;
+  g_sRadioInit.lDatarate = cAPP_S2LP_DATARATE_bps;
+  g_sRadioInit.lFreqDev = cAPP_S2LP_FREQ_DEVIATION_Hz;
+  g_sRadioInit.lBandwidth = cAPP_S2LP_BANDWIDTH_Hz;
+
+  g_sBasicPacketInit.xPreambleLength = cAPP_S2LP_PREAMBLE_LENGTH;
+  g_sBasicPacketInit.xSyncLength = cAPP_S2LP_SYNC_LENGTH;
+  g_sBasicPacketInit.lSyncWords = cAPP_S2LP_SYNC_WORD;
+  g_sBasicPacketInit.xFixVarLength = cAPP_S2LP_VARIABLE_LENGTH;
+  g_sBasicPacketInit.cExtendedPktLenField = cAPP_S2LP_EXTENDED_LENGTH_FIELD;
+  g_sBasicPacketInit.xCrcMode = cAPP_S2LP_CRC_MODE;
+  g_sBasicPacketInit.xAddressField = cAPP_S2LP_EN_ADDRESS;
+  g_sBasicPacketInit.xFec = cAPP_S2LP_EN_FEC;
+  g_sBasicPacketInit.xDataWhitening = cAPP_S2LP_EN_WHITENING;
+
+  g_sGPIOInit.xS2LPGpioPin = S2LP_GPIO_3;
+  g_sGPIOInit.xS2LPGpioMode = S2LP_GPIO_MODE_DIGITAL_OUTPUT_LP;
+  g_sGPIOInit.xS2LPGpioIO = S2LP_GPIO_DIG_OUT_IRQ;
+
+  S2LPRadioInit(&g_sRadioInit);
+  S2LPRadioSetMaxPALevel(S_DISABLE);
+  S2LPRadioSetPALeveldBm(7, cAPP_S2LP_POWER_dBm);
+  S2LPRadioSetPALevelMaxIndex(7);
+  
+  S2LPPktBasicInit(&g_sBasicPacketInit);
+
+  S2LPGpioIrqDeInit(NULL);
+  S2LPGpioIrqConfig(TX_DATA_SENT , S_ENABLE);
+  S2LPGpioIrqConfig(RX_DATA_READY, S_ENABLE);
+  S2LPPktBasicSetPayloadLength(20);
+  S2LPGpioIrqClearStatus();
+}
+
 uint16_t S2LPSpiWriteRegisters(uint8_t RegisterAddr, uint8_t NumByteToRead, uint8_t* pBuffer) {
   Error l_error = cLIB_ERRORNO_NoErr;
   uint16_t l_status = 0;

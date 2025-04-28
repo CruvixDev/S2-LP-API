@@ -50,6 +50,7 @@ int main(void) {
   /* Initialize all configured peripherals */
   vHAL_GPIO_init();
   errHAL_SPI_init();
+  vAPP_S2LP_init();
 
   uint8_t l_u8DevicePN = S2LPGeneralGetDevicePN();
   vHAL_ITM_logInfo("Device Part Number: %d\n", l_u8DevicePN);
@@ -57,9 +58,12 @@ int main(void) {
   uint8_t l_u8S2LPVersion = S2LPGeneralGetVersion();
   vHAL_ITM_logInfo("S2LP version: %d\n", l_u8S2LPVersion);
 
+  //Enter first time in RX mode
+  S2LPCmdStrobeCommand(CMD_RX);
+
   /* Main infinite loop */
   while (true) {
-
+    vAPP_S2LP_processEvents();
   }
 
   return 0;

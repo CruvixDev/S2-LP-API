@@ -222,7 +222,14 @@ uint16_t S2LPSpiReadFifo(uint8_t n_bytes, uint8_t* buffer) {
 
 /* Private functions ---------------------------------------------------------*/
 void vAPP_S2LP_onRxDataReady(void) {
-  //TODO
+  uint8_t l_u8DataSize = S2LPFifoReadNumberBytesRxFifo();
+
+  S2LPSpiReadFifo(l_u8DataSize, g_au8BufferRx);
+  g_au8BufferRx[l_u8DataSize++]='\0';
+  S2LPCmdStrobeCommand(CMD_FLUSHRXFIFO);
+
+  vHAL_ITM_logInfo("\n\rrx>%s\n\rtx>", (char*)g_au8BufferRx);
+  S2LPCmdStrobeCommand(CMD_RX);
 }
 
 /* ISR and Event handlers ----------------------------------------------------*/

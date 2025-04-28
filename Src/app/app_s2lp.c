@@ -228,7 +228,7 @@ void vAPP_S2LP_onRxDataReady(void) {
   g_au8BufferRx[l_u8DataSize++]='\0';
   S2LPCmdStrobeCommand(CMD_FLUSHRXFIFO);
 
-  vHAL_ITM_logInfo("\n\rrx>%s\n\rtx>", (char*)g_au8BufferRx);
+  vHAL_ITM_logInfo("Data received: %s\n", (char*)g_au8BufferRx);
   S2LPCmdStrobeCommand(CMD_RX);
 }
 

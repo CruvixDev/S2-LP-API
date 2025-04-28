@@ -32,6 +32,8 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/S2LP_Library/src/S2LP_Radio.c
     ../../Drivers/S2LP_Library/src/S2LP_PktBasic.c
     ../../Drivers/S2LP_Library/src/S2LP_Gpio.c
+    ../../Drivers/S2LP_Library/src/S2LP_PktWMbus.c
+    ../../Drivers/S2LP_Library/src/S2LP_PacketHandler.c
     ../../Src/hal/hal_gpio.c
     ../../Src/memorymap.c
     ../../Src/hal/hal_spi.c

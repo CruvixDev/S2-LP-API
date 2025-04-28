@@ -46,6 +46,7 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void vAPP_S2LP_init(void);
+void vAPP_S2LP_processEvents(void);
 
 /* Private defines -----------------------------------------------------------*/
 

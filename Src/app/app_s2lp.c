@@ -40,6 +40,7 @@ static SGpioInit g_sGPIOInit = {0};
 static FlagStatus g_eEventFlag = RESET;
 static S2LPIrqs g_sIrqStatus = {0};
 
+static uint8_t g_au8Message[cAPP_S2LP_HEADER_SIZE + cAPP_S2LP_FIFO_SIZE];
 static uint8_t g_au8BufferTx[cAPP_S2LP_HEADER_SIZE + cAPP_S2LP_FIFO_SIZE];
 static uint8_t g_au8BufferRx[cAPP_S2LP_STATUS_SIZE + cAPP_S2LP_FIFO_SIZE];
 
@@ -224,11 +225,11 @@ uint16_t S2LPSpiReadFifo(uint8_t n_bytes, uint8_t* buffer) {
 void vAPP_S2LP_onRxDataReady(void) {
   uint8_t l_u8DataSize = S2LPFifoReadNumberBytesRxFifo();
 
-  S2LPSpiReadFifo(l_u8DataSize, g_au8BufferRx);
-  g_au8BufferRx[l_u8DataSize++]='\0';
+  S2LPSpiReadFifo(l_u8DataSize, g_au8Message);
+  g_au8Message[l_u8DataSize++]='\0';
   S2LPCmdStrobeCommand(CMD_FLUSHRXFIFO);
 
-  vHAL_ITM_logInfo("Data received: %s\n", (char*)g_au8BufferRx);
+  vHAL_ITM_logInfo("Data received: %s\n", (char*)g_au8Message);
   S2LPCmdStrobeCommand(CMD_RX);
 }
 

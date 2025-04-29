@@ -1,0 +1,1 @@
+A simple project to receive data from a master with a S2LP module from ST (https://www.st.com/en/wireless-connectivity/s2-lp.html) on a X-NUCLEO-S2868A2 board (https://www.st.com/en/ecosystems/x-nucleo-s2868a2.html)
